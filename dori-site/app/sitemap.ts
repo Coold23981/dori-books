@@ -1,0 +1,1 @@
+import type {MetadataRoute} from "next";export default function sitemap():MetadataRoute.Sitemap{const base="https://dori-botanical-artist-books.gfdffsgfsd.chatgpt.site";return ["","artist","collections","process","journal","contact"].map(x=>({url:`${base}/${x}`}))}

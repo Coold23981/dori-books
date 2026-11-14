@@ -1,0 +1,2 @@
+import {config} from "../../../../lib/server";
+export async function GET(_request:Request,{params}:{params:Promise<{key:string}>}){const key=(await params).key;if(!/^artwork-[a-f0-9-]+\.(jpg|png|webp)$/.test(key)||!config().BUCKET)return new Response("Not found",{status:404});const object=await config().BUCKET!.get(key);if(!object)return new Response("Not found",{status:404});return new Response(object.body,{headers:{"Content-Type":object.httpMetadata?.contentType||"application/octet-stream","Cache-Control":"public, max-age=86400"}})}

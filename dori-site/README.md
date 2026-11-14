@@ -1,0 +1,68 @@
+# Dori Botanical Artist Books
+
+A provisional fine-art gallery and commerce codebase for Dori. No artworks, prices, policies or achievements are fabricated. The catalogue starts empty and checkout remains unavailable until genuine stock, shipping and PayFast credentials are configured. Publishing the source to GitHub does not by itself configure production data, secrets or payments.
+
+## Architecture
+
+- Vinext/React/TypeScript on Cloudflare Workers, with Cloudflare D1 for catalogue, orders and stock reservations, and R2 for artwork images. The starter supplies the local development runtime.
+- PayFast custom hosted checkout. The server generates a signed payment form; the passphrase remains server-only. The `notify` endpoint checks signature, merchant, total and PayFast's validation endpoint before changing order status. A return URL never marks an order paid.
+- D1 triggers atomically reject over-reservation of one-off works or editions. Orders reserve stock for 30 minutes; late payment confirmation fails closed if another paid order or live reservation has claimed the stock. Such payments require manual merchant reconciliation and refund. This edge case must be exercised with the merchant's sandbox before launch.
+- Genuine payments that cannot be applied because their reservation expired are recorded as `payment_review` for manual refund or reconciliation; they are never shown as confirmed acquisitions.
+- Browser session storage holds only the bag display. Prices and availability are read again from D1 at checkout.
+- Studio administration uses Sites' signed-in identity and an `ADMIN_USER_ID` allowlist. The admin can manage artworks, collection releases, journal entries, shipping zones and images; orders are read-only. There is no public admin write access.
+- Brevo double opt-in newsletter and transactional contact delivery remain disabled until configured. The contact form also requires Turnstile. No form claims success without a provider acceptance response.
+
+## Local development
+
+Requires Node.js 22.13+, npm, and a working npm registry connection.
+
+1. `npm ci`
+2. Copy `.env.example` to `.dev.vars`, set `SITE_URL` to the local URL and `ADMIN_USER_ID=local_seedy` for the starter's local mock sign-in. Leave payment, email and Turnstile fields blank until configured.
+3. `npm run build` to generate the local Worker config.
+4. Apply `drizzle/0000_initial.sql` to local D1: `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_initial.sql`
+5. `npm run dev` and open the printed local URL. Sign in locally at `/signin-with-chatgpt?return_to=/admin` for the admin.
+
+The initial SQL migration is intentionally hand-authored because it contains atomic inventory triggers and a stock view. Treat it as immutable after first application. Future schema changes should use a new numbered migration; do not replay the initial migration against an existing database.
+
+## Cloudflare Workers Builds settings (for a future launch)
+
+The suggested dashboard values `Build command: None` and `Deploy command: npx wrangler deploy` do not match this compiled app. Use `npm run build` and then `npx wrangler deploy --config dist/server/wrangler.json` **only after** replacing the local placeholder D1 database ID in the generated configuration with a real database binding and creating the R2 bucket. The generated local config currently names `site-creator-d1` and `site-creator-r2`; these are not provisioned production resources. Apply the database migration remotely before accepting orders. Do not run the deploy command as part of local review.
+
+Set the build root to `/dori-site` if the repository root is the parent `dori-books` folder; use `/` only if `dori-site` itself is the repository root. A build token belongs in Cloudflare's credential setting, never in the repository or build variables. Build variables can remain empty for the current disabled integrations, but `NEXT_PUBLIC_*` values need to be supplied at build time when those features are activated. Server secrets such as the PayFast passphrase and Brevo API key belong in runtime secrets.
+
+## Adding works and releases
+
+In `/admin`, create a collection (optional), then create each artwork with its verified slug, category, description, price in **cents**, edition size and stock. Unique works should have `edition_size=1` and `stock_total=1`. A limited edition needs its actual quantity, not a generic 10–20 placeholder. Upload artwork images and save their returned keys in the desired display order. Keep `status=draft` until photography and all details are approved; set `featured` to display a work on the homepage. Publish a journal entry only after its copy and date are verified. Add a shipping zone and activate it only after rates and destinations are confirmed. D1 guards against reducing stock beneath existing paid orders and active reservations.
+
+## Payment setup and test plan
+
+Create a PayFast sandbox merchant account and set a passphrase. Put the sandbox credentials in server-side runtime variables; do not commit them. `SITE_URL` must be a public HTTPS origin for PayFast ITN calls during sandbox testing. A private Sites preview cannot receive anonymous PayFast notifications, so use a dedicated public staging origin after the rest of the project is approved. Test successful, cancelled and delayed payments, duplicate ITNs, concurrent purchase of one unique work, edition quantity boundaries, reservation expiry and manual refund handling. Then switch `PAYFAST_MODE=live` and production credentials only after the merchant approves launch. PayFast requires merchant ID and merchant key in the customer POST form; the signing passphrase never goes to the browser.
+
+## Forms
+
+Brevo requires an API key, newsletter list ID, double opt-in template ID and confirmation redirect URL. Set `NEXT_PUBLIC_NEWSLETTER_ENABLED=true` only when configured. Contact requires a verified Brevo sender and destination plus Cloudflare Turnstile public/secret keys. The contact form is disabled if the public key is missing. Set the real Instagram URL in `NEXT_PUBLIC_INSTAGRAM_URL` to show that link.
+
+## Checks
+
+Run `npm run build`, `npx tsc --noEmit`, and `node scripts/check-inventory.mjs`, then test all routes on mobile and desktop. Run the PayFast sandbox scenarios above before any public launch. Automated full checkout tests are not included because the merchant account and external callbacks are not available in this workspace.
+
+## Launch checklist
+
+- [ ] Confirm brand name, logo and approved editorial copy.
+- [ ] Supply approved biography, portrait, genuine artwork and process photography.
+- [ ] Supply verified artwork descriptions, dimensions, materials, edition sizes, prices and inventory.
+- [ ] Approve shipping destinations, prices, dispatch expectations and packaging.
+- [ ] Provide PayFast sandbox and live merchant credentials; complete sandbox and live validation.
+- [ ] Provide verified studio contact details and Instagram URL.
+- [ ] Configure Brevo, double opt-in, sender verification and Turnstile.
+- [ ] Approve Privacy, Terms, Shipping and Returns pages with South African legal review, including POPIA and consumer rights.
+- [ ] Choose a public domain and hosting plan, configure DNS, HTTPS and public access.
+- [ ] Replace `SITE_URL`, sitemap origin and draft no-index robots directive with the production URL after approval.
+- [ ] Test keyboard access, mobile layout, email delivery, order fulfilment and refund procedures.
+
+## Sources for integrations
+
+- [PayFast custom integration](https://developers.payfast.co.za/docs)
+- [PayFast ITN validation](https://developers.payfast.co.za/docs/itn-instant-transaction-notification/)
+- [Brevo double opt-in](https://developers.brevo.com/reference/create-doi-contact)
+- [Brevo transactional email](https://developers.brevo.com/reference/send-transac-email)

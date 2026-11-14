@@ -1,0 +1,2 @@
+import {db} from "../../../../lib/catalog";
+export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){const id=(await params).id;if(!/^[0-9a-f-]{36}$/.test(id)||!db())return Response.json({status:"unknown"},{status:404});const order=await db()!.prepare("SELECT status FROM orders WHERE id = ?").bind(id).first<{status:string}>();return order?Response.json(order):Response.json({status:"unknown"},{status:404})}

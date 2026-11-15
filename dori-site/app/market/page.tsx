@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "../site-link";
 import { getMarketCategories } from "../../lib/market";
 import { getWorks } from "../../lib/catalog";
 import { CategoryImage } from "../category-image";

@@ -30,7 +30,7 @@ Use build root `/dori-site`, build command `npm run build`, and deploy command `
 
 Without production storage, the public site deploys with an empty catalogue; admin image uploads, catalogue editing and checkout are unavailable. To prepare storage, create a D1 database and enable R2 in the Cloudflare account, create an R2 bucket, then set build variables `DORI_D1_DATABASE_ID` (the real database UUID), `DORI_D1_DATABASE_NAME` (defaults to `dori-books`) and `DORI_R2_BUCKET_NAME` (the real bucket name). Rebuild after setting them. Apply `drizzle/0000_initial.sql` and then `drizzle/0001_market_categories.sql` to the remote D1 database. Add a trusted production admin authentication system before managing content on the public Worker. The placeholder D1 ID and `site-creator-r2` bucket are for local development only and are never included in a production build.
 
-Server secrets such as the PayFast passphrase and Brevo API key belong in runtime secrets. Checkout remains unavailable until genuine stock, shipping and PayFast settings are ready.
+Server secrets such as the PayFast passphrase and Brevo API key belong in runtime secrets. Set `NEXT_PUBLIC_CHECKOUT_ENABLED=true` only when genuine stock, shipping and PayFast settings are ready and the sandbox checkout has passed. Until then, the checkout page links back to the collections.
 
 ## Adding works and releases
 
@@ -42,7 +42,7 @@ Create a PayFast sandbox merchant account and set a passphrase. Put the sandbox 
 
 ## Forms
 
-Brevo requires an API key, newsletter list ID, double opt-in template ID and confirmation redirect URL. Set `NEXT_PUBLIC_NEWSLETTER_ENABLED=true` only when configured. Contact requires a verified Brevo sender and destination plus Cloudflare Turnstile public/secret keys. The contact form is disabled if the public key is missing. Set the real Instagram URL in `NEXT_PUBLIC_INSTAGRAM_URL` to show that link.
+Brevo requires an API key, newsletter list ID, double opt-in template ID and confirmation redirect URL. Set `NEXT_PUBLIC_NEWSLETTER_ENABLED=true` only when configured. Contact requires a verified Brevo sender and destination plus Cloudflare Turnstile public/secret keys. Set `NEXT_PUBLIC_CONTACT_ENABLED=true` only after both the email service and Turnstile are configured. Until then, the site shows useful collection and process links in place of inactive forms. Set the real Instagram URL in `NEXT_PUBLIC_INSTAGRAM_URL` to show that link.
 
 ## Checks
 
@@ -59,7 +59,7 @@ Run `npm run build`, `npx tsc --noEmit`, and `node scripts/check-inventory.mjs`,
 - [ ] Configure Brevo, double opt-in, sender verification and Turnstile.
 - [ ] Approve Privacy, Terms, Shipping and Returns pages with South African legal review, including POPIA and consumer rights.
 - [ ] Choose a public domain and hosting plan, configure DNS, HTTPS and public access.
-- [ ] Replace `SITE_URL`, sitemap origin and draft no-index robots directive with the production URL after approval.
+- [ ] Set `SITE_URL` to the approved production URL and replace the draft no-index robots directive after approval.
 - [ ] Test keyboard access, mobile layout, email delivery, order fulfilment and refund procedures.
 
 ## Sources for integrations

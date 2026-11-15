@@ -1,6 +1,6 @@
 # Dori Botanical Artist Books
 
-A provisional fine-art gallery and commerce codebase for Dori. No artworks, prices, policies or achievements are fabricated. The catalogue starts empty and checkout remains unavailable until genuine stock, shipping and PayFast credentials are configured. Publishing the source to GitHub does not by itself configure production data, secrets or payments.
+A provisional botanical art market and commerce codebase for Dori. The market starts with four categories: original A4 botanical drawings, original mini botanical canvases, hand bound Japanese botanical journals and hand drawn botanical bookmarks. No individual artworks, prices, policies or achievements are fabricated. The catalogue starts empty and checkout remains unavailable until genuine stock, shipping and PayFast credentials are configured. Publishing the source to GitHub does not by itself configure production data, secrets or payments.
 
 ## Architecture
 
@@ -19,7 +19,7 @@ Requires Node.js 22.13+, npm, and a working npm registry connection.
 1. `npm ci`
 2. Copy `.env.example` to `.dev.vars`, set `SITE_URL` to the local URL and `ADMIN_USER_ID=local_seedy` for the starter's local mock sign-in. Leave payment, email and Turnstile fields blank until configured.
 3. `npm run build` to generate the local Worker config.
-4. Apply `drizzle/0000_initial.sql` to local D1: `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_initial.sql`
+4. Apply `drizzle/0000_initial.sql` to a fresh local D1: `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config wrangler.local.jsonc --persist-to .wrangler/state --file drizzle/0000_initial.sql`. Then apply `drizzle/0001_market_categories.sql` with the same command and its filename. For an existing local database, apply only the new `0001` migration.
 5. `npm run dev` and open the printed local URL. Sign in locally at `/signin-with-chatgpt?return_to=/admin` for the admin.
 
 The initial SQL migration is intentionally hand-authored because it contains atomic inventory triggers and a stock view. Treat it as immutable after first application. Future schema changes should use a new numbered migration; do not replay the initial migration against an existing database.
@@ -28,13 +28,13 @@ The initial SQL migration is intentionally hand-authored because it contains ato
 
 Use build root `/dori-site`, build command `npm run build`, and deploy command `npx wrangler deploy`. The build writes `dist/server/wrangler.json`, which Wrangler uses for deployment. A build token belongs in Cloudflare's credential setting, never in the repository or build variables.
 
-Without production storage, the public site deploys with an empty catalogue; admin image uploads, catalogue editing and checkout are unavailable. To prepare storage, create a D1 database and enable R2 in the Cloudflare account, create an R2 bucket, then set build variables `DORI_D1_DATABASE_ID` (the real database UUID), `DORI_D1_DATABASE_NAME` (defaults to `dori-books`) and `DORI_R2_BUCKET_NAME` (the real bucket name). Rebuild after setting them. Apply `drizzle/0000_initial.sql` to the remote D1 database. Add a trusted production admin authentication system before managing content on the public Worker. The placeholder D1 ID and `site-creator-r2` bucket are for local development only and are never included in a production build.
+Without production storage, the public site deploys with an empty catalogue; admin image uploads, catalogue editing and checkout are unavailable. To prepare storage, create a D1 database and enable R2 in the Cloudflare account, create an R2 bucket, then set build variables `DORI_D1_DATABASE_ID` (the real database UUID), `DORI_D1_DATABASE_NAME` (defaults to `dori-books`) and `DORI_R2_BUCKET_NAME` (the real bucket name). Rebuild after setting them. Apply `drizzle/0000_initial.sql` and then `drizzle/0001_market_categories.sql` to the remote D1 database. Add a trusted production admin authentication system before managing content on the public Worker. The placeholder D1 ID and `site-creator-r2` bucket are for local development only and are never included in a production build.
 
 Server secrets such as the PayFast passphrase and Brevo API key belong in runtime secrets. Checkout remains unavailable until genuine stock, shipping and PayFast settings are ready.
 
 ## Adding works and releases
 
-In `/admin`, create a collection (optional), then create each artwork with its verified slug, category, description, price in **cents**, edition size and stock. Unique works should have `edition_size=1` and `stock_total=1`. A limited edition needs its actual quantity, not a generic 10–20 placeholder. Upload artwork images and save their returned keys in the desired display order. Keep `status=draft` until photography and all details are approved; set `featured` to display a work on the homepage. Publish a journal entry only after its copy and date are verified. Add a shipping zone and activate it only after rates and destinations are confirmed. D1 guards against reducing stock beneath existing paid orders and active reservations.
+The Market page and its four category pages are driven by `market_categories`. In `/admin`, use **categories** to add a page or turn off **active** to remove it from the Market and homepage without deleting its products. Category slugs are used in URLs and in the artwork `category` field. Create each artwork with its verified slug, category slug, description, price in **cents**, edition size and stock. Unique works should have `edition_size=1` and `stock_total=1`. A limited edition needs its actual quantity, not a generic 10–20 placeholder. Upload artwork images and save their returned keys in the desired display order. Keep `status=draft` until photography and all details are approved; set `featured` to display a work on the homepage. Add a shipping zone and activate it only after rates and destinations are confirmed. D1 guards against reducing stock beneath existing paid orders and active reservations.
 
 ## Payment setup and test plan
 

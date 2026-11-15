@@ -15,27 +15,27 @@ const { d1, r2 } = hostingConfig;
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 const managedLinux = readExecutionProfile() === "managed-linux";
 
-const localBindingConfig = {
+const bindingConfig = (command: string) => ({
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
-  d1_databases: d1
+  d1_databases: (command === "serve" ? d1 : process.env.DORI_D1_DATABASE_ID ? "DB" : null)
     ? [
         {
-          binding: d1,
-          database_name: "site-creator-d1",
-          database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+          binding: "DB",
+          database_name: process.env.DORI_D1_DATABASE_NAME || "dori-books",
+          database_id: command === "serve" ? SITE_CREATOR_PLACEHOLDER_DATABASE_ID : process.env.DORI_D1_DATABASE_ID!,
         },
       ]
     : [],
-  r2_buckets: r2
+  r2_buckets: (command === "serve" ? r2 : process.env.DORI_R2_BUCKET_NAME ? "BUCKET" : null)
     ? [
         {
-          binding: r2,
-          bucket_name: "site-creator-r2",
+          binding: "BUCKET",
+          bucket_name: command === "serve" ? "site-creator-r2" : process.env.DORI_R2_BUCKET_NAME!,
         },
       ]
     : [],
-};
+});
 
 export default defineConfig(async ({ command }) => {
   configureToolEnvironment(process.cwd());
@@ -60,7 +60,7 @@ export default defineConfig(async ({ command }) => {
         viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
         inspectorPort: false,
         config: {
-          ...localBindingConfig,
+          ...bindingConfig(command),
           ...(command === "serve"
             ? {
                 services: [

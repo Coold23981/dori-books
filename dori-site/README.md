@@ -24,11 +24,13 @@ Requires Node.js 22.13+, npm, and a working npm registry connection.
 
 The initial SQL migration is intentionally hand-authored because it contains atomic inventory triggers and a stock view. Treat it as immutable after first application. Future schema changes should use a new numbered migration; do not replay the initial migration against an existing database.
 
-## Cloudflare Workers Builds settings (for a future launch)
+## Cloudflare Workers Builds settings
 
-The suggested dashboard values `Build command: None` and `Deploy command: npx wrangler deploy` do not match this compiled app. Use `npm run build` and then `npx wrangler deploy --config dist/server/wrangler.json` **only after** replacing the local placeholder D1 database ID in the generated configuration with a real database binding and creating the R2 bucket. The generated local config currently names `site-creator-d1` and `site-creator-r2`; these are not provisioned production resources. Apply the database migration remotely before accepting orders. Do not run the deploy command as part of local review.
+Use build root `/dori-site`, build command `npm run build`, and deploy command `npx wrangler deploy`. The build writes `dist/server/wrangler.json`, which Wrangler uses for deployment. A build token belongs in Cloudflare's credential setting, never in the repository or build variables.
 
-Set the build root to `/dori-site` if the repository root is the parent `dori-books` folder; use `/` only if `dori-site` itself is the repository root. A build token belongs in Cloudflare's credential setting, never in the repository or build variables. Build variables can remain empty for the current disabled integrations, but `NEXT_PUBLIC_*` values need to be supplied at build time when those features are activated. Server secrets such as the PayFast passphrase and Brevo API key belong in runtime secrets.
+Without production storage, the public site deploys with an empty catalogue; admin image uploads, catalogue editing and checkout are unavailable. To enable them, create a D1 database and enable R2 in the Cloudflare account, create an R2 bucket, then set build variables `DORI_D1_DATABASE_ID` (the real database UUID), `DORI_D1_DATABASE_NAME` (defaults to `dori-books`) and `DORI_R2_BUCKET_NAME` (the real bucket name). Rebuild after setting them. Apply `drizzle/0000_initial.sql` to the remote D1 database before adding content. The placeholder D1 ID and `site-creator-r2` bucket are for local development only and are never included in a production build.
+
+Server secrets such as the PayFast passphrase and Brevo API key belong in runtime secrets. Checkout remains unavailable until genuine stock, shipping and PayFast settings are ready.
 
 ## Adding works and releases
 

@@ -10,7 +10,7 @@ type Props = { params: Promise<{ category: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = await getMarketCategory((await params).category);
-  return { title: category?.title ?? "Market", description: category?.description ?? "Botanical works by Dori." };
+  return { title: category?.title ?? "Market", description: category?.description ?? "Botanical works by Mandy Lebides." };
 }
 
 export default async function CategoryPage({ params }: Props) {

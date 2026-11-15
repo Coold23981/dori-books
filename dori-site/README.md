@@ -1,6 +1,6 @@
-# Dori Botanical Artist Books
+# Botanical Journals
 
-A provisional botanical art market and commerce codebase for Dori. The market starts with four categories: original A4 botanical drawings, original mini botanical canvases, hand bound Japanese botanical journals and hand drawn botanical bookmarks. No individual artworks, prices, policies or achievements are fabricated. The catalogue starts empty and checkout remains unavailable until genuine stock, shipping and PayFast credentials are configured. Publishing the source to GitHub does not by itself configure production data, secrets or payments.
+A provisional botanical art market and commerce codebase for Mandy Lebides. The market starts with four categories: original A4 botanical drawings, original mini botanical canvases, hand bound Japanese botanical journals and hand drawn botanical bookmarks. No individual artworks, prices, policies or achievements are fabricated. The catalogue starts empty and checkout remains unavailable until genuine stock, shipping and PayFast credentials are configured. Publishing the source to GitHub does not by itself configure production data, secrets or payments.
 
 ## Architecture
 

@@ -4,6 +4,15 @@ import type { ConnectorBinding } from "../lib/connector-contract.mjs";
 
 const worker = {
   fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
+    // Public Workers do not have the trusted Sites identity proxy. A visitor
+    // can send these headers directly, so discard them before route handling.
+    if (!import.meta.env.DEV) {
+      const headers = new Headers(request.headers);
+      for (const name of headers.keys()) {
+        if (name.startsWith("oai-authenticated-user-")) headers.delete(name);
+      }
+      request = new Request(request, { headers });
+    }
     let binding = ctx.props?.CONNECTORS;
     // Local preview emulates the same request-scoped capability. This branch and
     // the auxiliary service binding are absent from production builds.

@@ -44,6 +44,8 @@ Create a PayFast sandbox merchant account and set a passphrase. Put the sandbox 
 
 Brevo requires an API key, newsletter list ID, double opt-in template ID and confirmation redirect URL. Set `NEXT_PUBLIC_NEWSLETTER_ENABLED=true` only when configured. Contact requires a verified Brevo sender and destination plus Cloudflare Turnstile public/secret keys. Set `NEXT_PUBLIC_CONTACT_ENABLED=true` only after both the email service and Turnstile are configured. Until then, the site shows useful collection and process links in place of inactive forms. Set the real Instagram URL in `NEXT_PUBLIC_INSTAGRAM_URL` to show that link.
 
+See [NEWSLETTER.md](NEWSLETTER.md) for account setup, the owner's campaign workflow, costs, and end-to-end checks.
+
 ## Checks
 
 Run `npm run build`, `npx tsc --noEmit`, and `node scripts/check-inventory.mjs`, then test all routes on mobile and desktop. Run the PayFast sandbox scenarios above before any public launch. Automated full checkout tests are not included because the merchant account and external callbacks are not available in this workspace.

@@ -15,15 +15,33 @@ The website's signup form uses Brevo's double opt-in API. Brevo holds the subscr
 
 The existing `POST /api/newsletter` accepts `{ email, consent, website }` and returns a message. It asks Brevo to send a double opt-in email; it does not add someone to a campaign merely because they submitted the form. Brevo should add them to the selected list after confirmation. Verify this with a real inbox before launch.
 
-## First campaign and repeat sends
+## Editorial style and reusable campaign format
 
-Create one branded campaign template in Brevo with the sender, subject, preview text, a short opening, room for artwork images and links, and a visible unsubscribe link. Use only the confirmed subscribers list as recipients. The owner can then:
+Mandy's preferred newsletter is an informal studio note: chatty, warm, and easy to skim. Keep the main story high level and short. Add numbered notes at the end for readers who want sources, process details, definitions, or extra context. Each note can link to a journal entry, artwork, video, book, museum, or other useful source.
+
+Create one branded campaign template in Brevo using the Botanical Journals palette: warm ivory background, deep botanical green headings and buttons, generous space, and a simple single-column layout. Keep each paragraph to a few short sentences. Use a mix of approved artwork photos, process drawings, and video stills. For video, link a still image to the hosted video rather than relying on an embedded player in the email. Add descriptive alt text to images and a visible unsubscribe link. Use only the confirmed subscribers list as recipients. The owner can then:
 
 1. Open **Marketing → Campaigns → Create campaign → Email** in Brevo and reuse the template.
 2. Replace the text and images, check every link, and preview on desktop and mobile.
 3. Send a test to herself, read it in an inbox, then choose **Send now** or schedule it.
 
-## Copy-ready email drafts
+### Issue outline
+
+Use this order as a starting point; omit any section that does not suit the issue.
+
+1. **Subject:** a few conversational words, specific to the issue.
+2. **Preview text:** one short line that adds a detail without repeating the subject.
+3. **Greeting:** `Hello from the studio,` or a similarly natural opening.
+4. **Short story:** one or two brief paragraphs about what Mandy has been making, noticing, trying, or wondering. Keep the main thread readable without opening any links.
+5. **Visual pause:** one approved photograph or drawing with a short caption. A linked video still can point to a process clip.
+6. **Another small note:** a second short thought, question, or update, optionally with another image.
+7. **Sign-off:** a warm, personal close in Mandy's own voice.
+8. **Notes to explore:** numbered footnotes matching markers in the story. Keep each note brief, and make useful titles or source names live links. The notes are optional reading, not a second long article.
+9. **Footer:** studio identity, contact link, and Brevo's unsubscribe link.
+
+Keep the opening and story readable in under a minute. A good issue can be just a few short paragraphs, one image, and two or three notes; use more only when the material calls for it. Do not invent artwork facts, process steps, quotations, or sources to fill the format.
+
+### Copy-ready email drafts
 
 Use these as starting copy in Brevo's visual editor. The owner should review the sender name, links, and artwork before sending.
 
@@ -39,19 +57,30 @@ Use these as starting copy in Brevo's visual editor. The owner should review the
 >
 > Mandy
 
-**Reusable campaign** — Subject: `[A short note about the new work]`
+**Reusable campaign** — Subject: `[A few conversational words about this issue]`
+
+Preview: `[One detail that makes the reader curious]`
 
 > Hello from the studio,
 >
-> [Two or three sentences in Mandy's own words about this release or studio update.]
+> [A short, chatty opening about one thing Mandy has been making, noticing, or wondering.]
 >
-> [One approved artwork image, its verified title, and a link to its page.]
+> [A second short paragraph that continues the thought. Add a numbered marker¹ where a reader can choose to explore more.]
 >
-> Thank you for following along,
+> [Approved artwork or process image, with a brief caption and a link to its page.]
+>
+> [Optional linked video still, with a short sentence introducing the clip.]
+>
+> More, if you fancy it:
+>
+> 1. [Short note with a useful live link to a journal post or source.]
+> 2. [Another optional note with a live link.]
+>
+> Thanks for being here,
 >
 > Mandy
 
-Add Brevo's unsubscribe link in the welcome and campaign footers. Replace every bracketed placeholder before sending.
+Add the matching footnote marker in the story for each numbered note. Add Brevo's unsubscribe link in the welcome and campaign footers. Replace every bracketed placeholder before sending, and remove unused sections and markers.
 
 Brevo Free currently allows 300 email sends per day and automation for up to 2,000 contacts. Confirmation, welcome, test, and campaign emails all consume sending capacity. If a full campaign cannot fit within the daily limit, upgrade before sending; Starter begins at US$9/month and Standard at US$18/month, excluding taxes and higher-volume tiers. Recheck Brevo pricing before purchasing.
 

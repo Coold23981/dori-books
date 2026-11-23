@@ -2,10 +2,8 @@ declare namespace Cloudflare {
   interface Env {
     DB?: D1Database;
     BUCKET?: R2Bucket;
-    PAYFAST_MERCHANT_ID?: string;
-    PAYFAST_MERCHANT_KEY?: string;
-    PAYFAST_PASSPHRASE?: string;
-    PAYFAST_MODE?: string;
+    PAYSTACK_SECRET_KEY?: string;
+    PAYSTACK_WEBHOOK_SECRET?: string;
     SITE_URL?: string;
     ADMIN_USER_ID?: string;
     BREVO_API_KEY?: string;
